@@ -12,10 +12,8 @@ import console_providers
 class ProviderAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         if values[0] == "tcod":
-            print("Running with tcod")
             namespace.provider = console_providers.TcodOSProvider
         else:
-            print("Running with curses")
             namespace.provider = console_providers.CursesProvider
 
 if __name__ == "__main__":
@@ -25,4 +23,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     providerClass = args.provider
     provider = providerClass()
-    provider.execute_module(args.program)
+    provider.execute_program(args.program)

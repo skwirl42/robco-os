@@ -4,6 +4,7 @@ left arrow, right arrow, home, end, etc.
 """
 
 UNKNOWN_KEY = -1
+NO_KEY = 0
 
 # ASCII values
 BACKSPACE = 8
