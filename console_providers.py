@@ -76,6 +76,10 @@ class BaseOSProvider(ABC):
         pass
 
     @abstractmethod
+    def invert_at(self, x, y):
+        pass
+
+    @abstractmethod
     def clear(self):
         pass
 
@@ -94,7 +98,8 @@ class BaseOSProvider(ABC):
 class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
-        self.console = tcod.console_init_root(w=55, h=22)
+        tcod.console_set_custom_font('ibm-ega8-page437.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 16)
+        self.console = tcod.console_init_root(w=56, h=22, order='F')
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
 
@@ -154,10 +159,21 @@ class TcodOSProvider(BaseOSProvider):
     def set_input_blocking_mode(self, is_blocking):
         self.is_blocking = is_blocking
 
+    def invert_at(self, x, y):
+        for channel in range(3):
+            temp = self.console.fg[x, y, channel]
+            self.console.fg[x, y, channel] = self.console.bg[x, y, channel]
+            self.console.bg[x, y, channel] = temp
+
 class CursesProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
         self.console = curses.initscr()
+        curses.curs_set(False)
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        self.console.attron(curses.color_pair(1))
 
     def execute_program(self, program_name):
         self.program = self.execute_program_import(program_name)
@@ -165,6 +181,9 @@ class CursesProvider(BaseOSProvider):
 
     def __curses_wrapper(self, console):
         self.program.draw(self)
+
+    def invert_at(self, x, y):
+        self.console.chgat(y, x, 1, curses.color_pair(2))
 
     def getch(self):
         getch = self.console.getch()
