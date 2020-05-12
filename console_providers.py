@@ -57,9 +57,9 @@ class BaseOSProvider(ABC):
 
     # Loads and runs the module identified by module_name and runs it
     # replacing the currently running module
-    def execute_program_import(self, program_name):
+    def execute_program_import(self, program_name, args):
         module = __import__("programs." + program_name, globals(), locals(), [program_name])
-        return module.Program(self)
+        return module.Program(self, args)
 
     # getch must return an int that is ether an ASCII code or a constant from consolekeys
     @abstractmethod
@@ -88,7 +88,7 @@ class BaseOSProvider(ABC):
         pass
 
     @abstractmethod
-    def execute_program(self, program):
+    def execute_program(self, program, args):
         pass
 
     @abstractmethod
@@ -104,9 +104,9 @@ class TcodOSProvider(BaseOSProvider):
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
 
-    def execute_program(self, program_name):
+    def execute_program(self, program_name, args):
         # TODO: Start a rendering loop to run this continuously
-        program = self.execute_program_import(program_name)
+        program = self.execute_program_import(program_name, args)
         program.draw(self)
 
     def getch(self):
@@ -180,8 +180,8 @@ class CursesProvider(BaseOSProvider):
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
         self.console.attron(curses.color_pair(1))
 
-    def execute_program(self, program_name):
-        self.program = self.execute_program_import(program_name)
+    def execute_program(self, program_name, args):
+        self.program = self.execute_program_import(program_name, args)
         curses.wrapper(self.__curses_wrapper)
 
     def __curses_wrapper(self, console):

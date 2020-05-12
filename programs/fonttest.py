@@ -2,7 +2,7 @@ import consolekeys
 
 class Program:
 
-    def __init__(self, provider):
+    def __init__(self, provider, args):
 
         self.key_pressed = 0
         self.provider = provider

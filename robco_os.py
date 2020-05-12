@@ -17,10 +17,11 @@ class ProviderAction(argparse.Action):
             namespace.provider = console_providers.CursesProvider
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Excute the RobCo OS simulator")
-    parser.add_argument("--provider", default=console_providers.CursesProvider, action=ProviderAction, nargs=1, choices=["curses", "tcod"], help="selects which console provider is used")
+    parser = argparse.ArgumentParser(description="Execute the RobCo OS simulator")
+    parser.add_argument("-p", "--provider", default=console_providers.CursesProvider, action=ProviderAction, nargs=1, choices=["curses", "tcod"], help="selects which console provider is used")
     parser.add_argument("program", help="the RobCo OS program to launch")
+    parser.add_argument("args", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     providerClass = args.provider
     provider = providerClass()
-    provider.execute_program(args.program)
+    provider.execute_program(args.program, args.args)

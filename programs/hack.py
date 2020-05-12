@@ -7,12 +7,23 @@ import string
 import os
 import sys
 import consolekeys
+import argparse
 
 class Program:
 
-    def __init__(self, provider):
+    def __init__(self, provider, args):
 
         self.provider = provider
+
+        parser = argparse.ArgumentParser(description="Terminal hacking mini-game")
+        parser.add_argument('-w', '--word-length', default=5, type=int)
+        parser.add_argument('-n', '--number-of-words', default=12, type=int)
+        hackargs = parser.parse_args(args)
+        #print(hackargs)
+
+        self.word_length = hackargs.word_length
+        self.num_words = hackargs.number_of_words
+        
         self.logged_in = False
         self.locked_out = False
         self.terminal_status = 'Accessible'
@@ -21,8 +32,6 @@ class Program:
         self.test_result = ''
         self.address = 0
         self.rows = 16
-        self.word_length = 5 # Password length from 4 to 14
-        self.num_words = 12
         self.difficulty = 1
         self.selectable_size = 384 # 16 rows of 12 char columns
         self.side_text_size = 225 # 15 rows of 15 char columns
@@ -42,14 +51,6 @@ class Program:
         self.cursor_x = 7
         self.cursor_y = 6
 
-        # stdscr = curses.initscr()
-        # curses.curs_set(False)
-        # stdscr.clear()
-        # stdscr.refresh()
-        # curses.start_color()
-        # curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        # curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
-        # stdscr.attron(curses.color_pair(1))
         self.provider.clear()
         self.provider.refresh()
 
@@ -68,7 +69,7 @@ class Program:
             self.side_text.append(' ')
 
         # Generate a new "memory" dump populated with junk
-        for char in range(self.selectable_size):
+        for _ in range(self.selectable_size):
             self.selectable_text.append(random.choice(junk_chars))
 
         # Generate a list of words with one password
@@ -93,7 +94,7 @@ class Program:
 
         for word in self.word_list:
             # Overwrite the junk chars with the words we want
-            for char_idx, char in enumerate(list(word)):
+            for char_idx, _ in enumerate(list(word)):
                 # Place the individual letters
                 self.selectable_text[self.offset+char_idx] = word[char_idx]
                 # Mark the start of all non-passwords
@@ -106,18 +107,13 @@ class Program:
                 self.offset = self.selectable_size - self.word_length
 
     def update_cursor(self):
-        has_pressed = False
         if self.key_pressed == consolekeys.DOWN_ARROW:
-            has_pressed = True
             self.cursor_y = self.cursor_y + 1
         elif self.key_pressed == consolekeys.UP_ARROW:
-            has_pressed = True
             self.cursor_y = self.cursor_y - 1
         elif self.key_pressed == consolekeys.RIGHT_ARROW:
-            has_pressed = True
             self.cursor_x = self.cursor_x + 1
         elif self.key_pressed == consolekeys.LEFT_ARROW:
-            has_pressed = True
             self.cursor_x = self.cursor_x - 1
 
         # Constrain the position to selectable areas of the two columns
@@ -179,7 +175,7 @@ class Program:
 
         if self.selectable_text[self.selection_index].isupper():
             # At most, look right of a letter up to the current word length
-            for len_offset, char in enumerate(range(self.word_length+1)):
+            for len_offset, _ in enumerate(range(self.word_length+1)):
                 # Any junk character marks the end of the word
                 if not self.selectable_text[self.selection_index + len_offset].isupper():
                     self.end_of_word = self.selection_index + len_offset
@@ -202,7 +198,7 @@ class Program:
                 self.closing_char = '>'
             # Columns are 12 chars wide, so search up to that many spaces away within selectable text
             cursor_pos = self.get_cursor_pos_from_index(self.selection_index)
-            for len_offset, char in enumerate(range(13)):
+            for len_offset, _ in enumerate(range(13)):
                 # Don't look past the end of the list
                 if self.selection_index + len_offset > 383:
                     break
@@ -332,7 +328,7 @@ class Program:
 
                 x = len(remaining_string) + 1
                 # Update attempts remaining after testing
-                for attempt in range(self.attempts):
+                for _ in range(self.attempts):
                     provider.invert_at(x, 4)
                     x += 2
 
