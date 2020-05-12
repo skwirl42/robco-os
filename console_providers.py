@@ -1,5 +1,4 @@
 import tcod
-import curses
 import consolekeys
 import simpleaudio
 import os
@@ -98,7 +97,6 @@ class BaseOSProvider(ABC):
 class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
-        #tcod.console_set_custom_font('ibm-ega8-page437.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 16)
         tcod.console_set_custom_font('font/robco-termfont.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 8)
         self.console = tcod.console_init_root(w=60, h=24, order='F')
         self.console.default_fg = (0, 255, 0)
@@ -169,65 +167,3 @@ class TcodOSProvider(BaseOSProvider):
             temp = self.console.fg[x, y, channel]
             self.console.fg[x, y, channel] = self.console.bg[x, y, channel]
             self.console.bg[x, y, channel] = temp
-
-class CursesProvider(BaseOSProvider):
-    def __init__(self):
-        self.common_setup()
-        self.console = curses.initscr()
-        curses.curs_set(False)
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
-        self.console.attron(curses.color_pair(1))
-
-    def execute_program(self, program_name, args):
-        self.program = self.execute_program_import(program_name, args)
-        curses.wrapper(self.__curses_wrapper)
-
-    def __curses_wrapper(self, console):
-        self.program.draw(self)
-
-    def invert_at(self, x, y):
-        self.console.chgat(y, x, 1, curses.color_pair(2))
-
-    def getch(self):
-        getch = self.console.getch()
-        char = consolekeys.NO_KEY
-        if getch >= ord(' ') and getch <= ord('~'):
-            char = getch
-        if getch >= curses.KEY_F0 and getch <= curses.KEY_F14:
-            char = consolekeys.FUNC_0 + (getch - curses.KEY_F0)
-
-        if char == consolekeys.NO_KEY:
-            mappings = {
-                curses.KEY_BACKSPACE: consolekeys.BACKSPACE,
-                curses.KEY_ENTER: consolekeys.ENTER,
-
-                curses.KEY_LEFT: consolekeys.LEFT_ARROW,
-                curses.KEY_RIGHT: consolekeys.RIGHT_ARROW,
-                curses.KEY_UP: consolekeys.UP_ARROW,
-                curses.KEY_DOWN: consolekeys.DOWN_ARROW,
-
-                curses.KEY_HOME: consolekeys.HOME,
-                curses.KEY_END: consolekeys.END,
-                curses.KEY_PPAGE: consolekeys.PAGE_UP,
-                curses.KEY_NPAGE: consolekeys.PAGE_DOWN,
-            }
-            char = mappings.get(getch, consolekeys.UNKNOWN_KEY)
-        self.play_sound_for_char(char)
-        return char
-
-    def set_character(self, x, y, ch):
-        self.console.addch(y, x, ch)
-
-    def print_str(self, x, y, str):
-        self.console.addstr(y, x, str)
-
-    def clear(self):
-        self.console.clear()
-
-    def refresh(self):
-        self.console.refresh()
-
-    def set_input_blocking_mode(self, is_blocking):
-        self.console.nodelay(not is_blocking)

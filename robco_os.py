@@ -9,19 +9,10 @@ import argparse
 import consolekeys
 import console_providers
 
-class ProviderAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        if values[0] == "tcod":
-            namespace.provider = console_providers.TcodOSProvider
-        else:
-            namespace.provider = console_providers.CursesProvider
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Execute the RobCo OS simulator")
-    parser.add_argument("-p", "--provider", default=console_providers.CursesProvider, action=ProviderAction, nargs=1, choices=["curses", "tcod"], help="selects which console provider is used")
     parser.add_argument("program", help="the RobCo OS program to launch")
-    parser.add_argument("args", nargs=argparse.REMAINDER)
-    args = parser.parse_args()
-    providerClass = args.provider
-    provider = providerClass()
-    provider.execute_program(args.program, args.args)
+    parser.add_argument("args", nargs=argparse.REMAINDER, help="arguments passed to the program")
+    mainargs = parser.parse_args()
+    provider = console_providers.TcodOSProvider()
+    provider.execute_program(mainargs.program, mainargs.args)
