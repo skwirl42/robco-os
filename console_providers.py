@@ -98,8 +98,9 @@ class BaseOSProvider(ABC):
 class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
-        tcod.console_set_custom_font('ibm-ega8-page437.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 16)
-        self.console = tcod.console_init_root(w=56, h=22, order='F')
+        #tcod.console_set_custom_font('ibm-ega8-page437.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 16)
+        tcod.console_set_custom_font('font/robco-termfont.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 8)
+        self.console = tcod.console_init_root(w=60, h=24, order='F')
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
 
@@ -128,7 +129,9 @@ class TcodOSProvider(BaseOSProvider):
         if char == consolekeys.NO_KEY:
             mappings = {
                 tcod.KEY_BACKSPACE: consolekeys.BACKSPACE,
+                tcod.KEY_DELETE: consolekeys.DELETE,
                 tcod.KEY_ENTER: consolekeys.ENTER,
+                tcod.KEY_ESCAPE: consolekeys.ESCAPE,
 
                 tcod.KEY_LEFT: consolekeys.LEFT_ARROW,
                 tcod.KEY_RIGHT: consolekeys.RIGHT_ARROW,
@@ -139,6 +142,8 @@ class TcodOSProvider(BaseOSProvider):
                 tcod.KEY_END: consolekeys.END,
                 tcod.KEY_PAGEUP: consolekeys.PAGE_UP,
                 tcod.KEY_PAGEDOWN: consolekeys.PAGE_DOWN,
+
+                tcod.KEY_TAB: consolekeys.TAB,
             }
             char = mappings.get(key.vk, consolekeys.UNKNOWN_KEY)
         self.play_sound_for_char(char)
@@ -151,7 +156,7 @@ class TcodOSProvider(BaseOSProvider):
         tcod.console_flush()
 
     def set_character(self, x, y, ch):
-        self.console.putchar(x, y, ord(ch))
+        self.console.put_char(x, y, ord(ch))
 
     def print_str(self, x, y, str):
         self.console.print_(x, y, str)
