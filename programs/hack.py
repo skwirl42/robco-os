@@ -298,7 +298,7 @@ class Program:
 
     def draw(self, provider):
 
-        while self.key_pressed is not ord('q'):
+        while self.key_pressed is not ord('q') and self.key_pressed is not consolekeys.ESCAPE:
 
             provider.clear()
 
@@ -310,7 +310,7 @@ class Program:
 
                 # Test Selection, pass, incorrect, bonus, or lockout
                 # Also, "scroll" the printed side output up after testing
-                if self.key_pressed == ord('e'):
+                if self.key_pressed == ord('e') or self.key_pressed == consolekeys.ENTER:
                     self.terminal_status = self.test_selection()
                     if self.terminal_status == 'Entry denied.':
                         self.scroll_side_text(self.word_to_print)
