@@ -98,7 +98,7 @@ class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
         tcod.console_set_custom_font('font/robco-termfont.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 8)
-        self.console = tcod.console_init_root(w=60, h=24, order='F')
+        self.console = tcod.console_init_root(w=60, h=22, order='F')
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
 
