@@ -1,15 +1,25 @@
 import consolekeys
+import argparse
 
 class Program:
 
     def __init__(self, provider, args):
+
+        parser = argparse.ArgumentParser(description="RobCo OS Font Test")
+        parser.add_argument("string", nargs="*")
+        fontargs = parser.parse_args(args)
+
+        if fontargs.string is not None and len(fontargs.string) > 0:
+            self.string = ' '.join(fontargs.string)
+        else:
+            self.string = 'No string argument provided'
 
         self.key_pressed = 0
         self.provider = provider
         self.provider.clear()
         self.provider.refresh()
 
-    def draw(self, provider):
+    def run(self, provider):
 
         while self.key_pressed is not ord('q') and self.key_pressed is not consolekeys.ESCAPE:
 
@@ -26,8 +36,14 @@ class Program:
             self.provider.print_str(0, 9, 'esse cillum dolore eu fugiat nulla pariatur. Excepteur sint')
             self.provider.print_str(0, 10, 'occaecat cupidatat non proident, sunt in culpa qui officia')
             self.provider.print_str(0, 11, 'deserunt mollit anim id est laborum.')
+
+            if self.string is not None:
+                self.provider.print_str(0, 12, self.string)
+
             self.provider.refresh()
 
             self.key_pressed = provider.getch()
             self.provider.set_input_blocking_mode(True)
+
+        return None
 

@@ -57,6 +57,8 @@ class BaseOSProvider(ABC):
     # Loads and runs the module identified by module_name and runs it
     # replacing the currently running module
     def execute_program_import(self, program_name, args):
+        if program_name is None:
+            return
         module = __import__("programs." + program_name, globals(), locals(), [program_name])
         return module.Program(self, args)
 
@@ -101,11 +103,19 @@ class TcodOSProvider(BaseOSProvider):
         self.console = tcod.console_init_root(w=60, h=22, order='F', fullscreen=True)
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
+        self.program = None
 
     def execute_program(self, program_name, args):
-        # TODO: Start a rendering loop to run this continuously
-        program = self.execute_program_import(program_name, args)
-        program.draw(self)
+        exit = False
+        while not exit:
+            self.program = self.execute_program_import(program_name, args)
+            result = self.program.run(self)
+            
+            if result is None or len(result) == 0 or result[0] is None:
+                exit = True
+            else:
+                program_name = result[0]
+                args = result[1]
 
     def getch(self):
         key = tcod.KEY_NONE
