@@ -18,11 +18,15 @@ class Program:
         parser = argparse.ArgumentParser(description="Terminal hacking mini-game")
         parser.add_argument('-w', '--word-length', default=5, type=int)
         parser.add_argument('-n', '--number-of-words', default=12, type=int)
+        parser.add_argument('-p', '--program', help='the program to run upon successful password entry', default=None)
+        parser.add_argument('args', nargs="*", help="arguments to be passed along to the next program", default=[])
         hackargs = parser.parse_args(args)
         #print(hackargs)
 
         self.word_length = hackargs.word_length
         self.num_words = hackargs.number_of_words
+        self.next_program = hackargs.program
+        self.next_args = hackargs.args
         
         self.logged_in = False
         self.locked_out = False
@@ -292,7 +296,7 @@ class Program:
         for offset, letter in enumerate(list(text_to_scroll)):
             self.side_text[211 + offset] = letter
 
-    def draw(self, provider):
+    def run(self, provider):
 
         while self.key_pressed is not ord('q') and self.key_pressed is not consolekeys.ESCAPE:
 
@@ -379,6 +383,9 @@ class Program:
                 provider.print_str(0, 21, self.terminal_status)
                 provider.invert_at(len(self.terminal_status), 21) #, '█', curses.A_BLINK | curses.color_pair(1))
 
+                if self.key_pressed is consolekeys.ENTER:
+                    return [self.next_program, self.next_args]
+
             # Refresh the screen
             provider.refresh()
 
@@ -387,17 +394,5 @@ class Program:
             # Lock out or log in will set nodelay() to True, making getch non-blocking
             # but we want to immediately revert it to wait for input and not constantly draw the terminal
             provider.set_input_blocking_mode(True)
-#
-#     def main(self):
-#         # Cleanly handle setup and close of curses within the shell
-#         curses.wrapper(self.draw_terminal)
-#
-# word_length = 5
-# if len(sys.argv) > 1:
-#     word_length = int(sys.argv[1])
-#
-# terminal = TerminalGame(word_length)
-#
-# if __name__ == "__main__":
-#
-#     terminal.main()
+
+        return None

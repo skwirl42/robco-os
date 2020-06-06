@@ -239,4 +239,3 @@ class PiTermProvider(BaseOSProvider):
 					return char
 			elif event.type == "QUIT":
 				return consolekeys.ESCAPE
-
