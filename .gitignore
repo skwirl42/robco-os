@@ -29,6 +29,8 @@ wheels/
 MANIFEST
 [Ss]cripts/
 pyvenv.cfg
+bin/
+share/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

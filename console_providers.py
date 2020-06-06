@@ -4,6 +4,7 @@ import simpleaudio
 import os
 import random
 from abc import ABC, abstractmethod
+import PiTerm
 
 """
 Program modules must define:
@@ -14,9 +15,6 @@ Program modules must define:
     - this will be implemented in the future, depending on the host OS
 """
 
-"""
-The console is assumed to be 55x22 based on an (un)educated guess
-"""
 class BaseOSProvider(ABC):
     def common_setup(self):
         self.is_blocking = True
@@ -98,7 +96,7 @@ class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
         tcod.console_set_custom_font('font/robco-termfont.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 8)
-        self.console = tcod.console_init_root(w=60, h=22, order='F', fullscreen=True)
+        self.console = tcod.console_init_root(w=60, h=24, order='F', fullscreen=True)
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
 
@@ -167,3 +165,34 @@ class TcodOSProvider(BaseOSProvider):
             temp = self.console.fg[x, y, channel]
             self.console.fg[x, y, channel] = self.console.bg[x, y, channel]
             self.console.bg[x, y, channel] = temp
+
+class PiTermProvider(BaseOSProvider):
+    def __init__(self):
+        self.common_setup()
+        PiTerm.alloc('font/robco-termfont.png')
+
+    def execute_program(self, program_name, args):
+        # TODO: Start a rendering loop to run this continuously
+        program = self.execute_program_import(program_name, args)
+        program.draw(self)
+
+    def clear(self):
+        PiTerm.clear()
+
+    def refresh(self):
+        PiTerm.refresh()
+
+    def set_character(self, x, y, ch):
+        PiTerm.set_character(x, y, ord(ch))
+
+    def print_str(self, x, y, string):
+        PiTerm.print_str(x, y, string)
+
+    def invert_at(self, x, y):
+        PiTerm.invert_at(x, y)
+
+    def set_input_blocking_mode(self, is_blocking):
+        self.is_blocking = is_blocking
+
+    def getch(self):
+        return consolekeys.NO_KEY

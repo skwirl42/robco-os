@@ -14,5 +14,5 @@ if __name__ == "__main__":
     parser.add_argument("program", help="the RobCo OS program to launch")
     parser.add_argument("args", nargs=argparse.REMAINDER, help="arguments passed to the program")
     mainargs = parser.parse_args()
-    provider = console_providers.TcodOSProvider()
+    provider = console_providers.PiTermProvider()
     provider.execute_program(mainargs.program, mainargs.args)
