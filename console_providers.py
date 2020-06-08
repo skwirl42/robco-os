@@ -62,7 +62,7 @@ class BaseOSProvider(ABC):
         module = __import__("programs." + program_name, globals(), locals(), [program_name])
         return module.Program(self, args)
 
-    # getch must return an int that is ether an ASCII code or a constant from consolekeys
+    # getch must return an int that is either an ASCII code or a constant from consolekeys
     @abstractmethod
     def getch(self):
         pass
@@ -100,9 +100,11 @@ class TcodOSProvider(BaseOSProvider):
     def __init__(self):
         self.common_setup()
         tcod.console_set_custom_font('font/robco-termfont.png', tcod.FONT_LAYOUT_ASCII_INROW, 16, 8)
-        self.console = tcod.console_init_root(w=60, h=22, order='F', fullscreen=True)
+        self.console = tcod.console_init_root(w=60, h=24, order='F', fullscreen=True)
         self.console.default_fg = (0, 255, 0)
         self.console.default_bg = (0, 0, 0)
+        self.clear()
+        self.refresh()
         self.program = None
 
     def execute_program(self, program_name, args):
